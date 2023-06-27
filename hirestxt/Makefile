@@ -1,3 +1,5 @@
+all: screen.o
+
 %.o: %.c
 	cmoc -c $<
 
