@@ -1,0 +1,58 @@
+To initialize the 51x24 text screen at $0E00, define a HiResTextScreenInit
+object and call initHiResTextScreen() with its address:
+
+    #include "hirestxt.h"
+    
+    ...
+
+    struct HiResTextScreenInit init =
+        {
+            51,
+            writeCharAt_51cols,
+            (byte) (0x0E00 / 512),
+            TRUE
+        };
+    initHiResTextScreen(&init);
+
+To use the 42x24 mode, replace 51 and writeCharAt_51cols with 42 and
+writeCharAt_42cols.
+
+Then, see hirestxt.h for the available functions.
+
+To link with this library, specify the following on the linking phase
+CMOC command line:
+
+    -L <dir> to specify directory where the .a files can be found
+
+    -lhirestxt
+
+    -lhirestxt-51x24 if the 51x24 mode is used by the program
+
+    -lhirestxt-42x24 if the 42x24 mode is used by the program
+
+This system is designed to allow the client program to only include
+code and data for one of the two modes, when the program does not
+use both modes.
+
+
+DRAGON SUPPORT
+
+To compile for the Dragon, pass TARGET=dragon to make.
+
+
+LICENSE
+
+This library is in the public domain.
+
+
+VERSION HISTORY
+
+0.1.0 - 2016-05-01 - First public release.
+0.1.1 - 2016-09-12 - Adapted to CMOC 0.1.31 re: inline asm.
+0.1.2 - 2016-12-26 - HIRESTEXT_NO_VT52 to avoid VT-52 code.
+0.2.0 - 2017-12-01 - Adapted to modular compilation under CMOC 0.1.43.
+0.2.1 - 2018-04-03 - Adapted to modular compilation under CMOC 0.1.51.
+0.3.0 - 2018-09-20 - Added 42x24 text screen and 5x8 font.
+                     Adapted to CMOC 0.1.53.
+0.3.1 - 2018-11-25 - Fixed linking error re: putBitmaskInScreenWord() in 42x24 mode.
+                     Now compilable for the Dragon (make TARGET=dragon).
