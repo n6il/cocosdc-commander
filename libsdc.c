@@ -197,7 +197,7 @@ int n;
 
 	r = sdlstdir(path, 0);
 	if (r & FAILED)
-		return r;
+		return 0;
 	end = 0;
 	m = 0;
 	while(n && (! end))

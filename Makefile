@@ -23,4 +23,4 @@ sdccmdr.bin: $(OBJS) libhirestxt.a
 clean:
 	make -C hirestxt clean
 	make -C hirestxt/hirestxt-0.3.1 clean
-	rm -f *.o *.dsk
+	rm -f *.o *.dsk *.bin *.BIN

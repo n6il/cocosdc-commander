@@ -42,9 +42,9 @@ int prntdir()
 	{
 		csr_pos(PROMPTLN, 0);
 		clr_eos();
-		printf("sdgetpth() FAILED\n");
+		puts("sdgetpth() FAILED\n");
 		printf("Result:0x%02x - Press Key...", r);
-		c = waitkey(1);
+		c = getchar();
 	}
 	else
 		printf("Dir: %s\n", buf);
@@ -60,7 +60,7 @@ int prntmnts()
 	struct dirent *p;
 
 	csr_pos(DIRSTLN, 26);
-	printf("Current Mounts");
+	puts("Current Mounts");
 
 	csr_pos(DIRSTLN+2, 26);
 	clr_eol();
@@ -82,7 +82,7 @@ int prntmnts()
 	}
 	else
 	{
-		printf("--");
+		puts("--");
 	}
 
 	csr_pos(DIRSTLN+3 ,26);
@@ -105,7 +105,26 @@ int prntmnts()
 	}
 	else
 	{
-		printf("--");
+		puts("--");
+	}
+	return r;
+}
+
+int _mount(drive, buf)
+int drive;
+char *buf;
+{
+	char c;
+	int r;
+
+	r =  sdmnt(drive, buf);
+	if (r & FAILED)
+	{
+		csr_pos(PROMPTLN, 0);
+		clr_eos();
+		printf("sdmnt(%d, %s) FAILED\n", drive, buf);
+		printf("Result:0x%02x - Press Key...", r);
+		c = getchar();
 	}
 	return r;
 }
@@ -122,15 +141,7 @@ int idx, drive;
 	strcat(buf, ".");
 	strncatz(buf, dbuf[idx].ext, 3);
 
-	r =  sdmnt(drive, buf);
-	if (r & FAILED)
-	{
-		csr_pos(PROMPTLN, 0);
-		clr_eos();
-		printf("sdmnt(%d, %s) FAILED\n", drive, buf);
-		printf("Result:0x%02x - Press Key...", r);
-		c = waitkey(1);
-	}
+	r =  _mount(drive, buf);
 	return r;
 }
 
@@ -145,7 +156,7 @@ int umount(drive)
 		clr_eos();
 		printf("sdumnt(%d) FAILED\n", drive);
 		printf("Result:0x%02x - Press Key...", r);
-		c = waitkey(1);
+		c = getchar();
 	}
 	return r;
 }
@@ -168,7 +179,7 @@ int idx;
 			clr_eos();
 			printf("sdchdir(%s) FAILED\n", buf);
 			printf("Result:0x%02x - Press Key...", r);
-			c = waitkey(1);
+			c = getchar();
 		}
 	}
 	else if ( ! isHidden(attr) )
@@ -179,8 +190,8 @@ int idx;
 		csr_pos(PROMPTLN, 0);
 		clr_eos();
 		printf("File: %s \n", buf);
-		printf("Enter drive (0,1) Any-aborts ?");
-		c = waitkey(1);
+		puts("Enter drive (0,1) Any-aborts ?");
+		c = getchar();
 		switch (c)
 		{
 			case KEY_ZERO:
@@ -196,21 +207,14 @@ int idx;
 
 int doChdir()
 {
-	char c, buf[80], *p;
+	char c, buf[256];
 	int r;
 
 	csr_pos(PROMPTLN, 0);
 	clr_eos();
-	printf("Change Directory\n");
-	printf("? ");
-	c=0;
-	p=buf;
-	while ((c=waitkey(1)) != KEY_ENTER)
-	{
-		*p++ = c;
-		printf("%c", c);
-	}
-	*p = 0;
+	puts("Change Directory\n");
+	puts("? ");
+	gets(buf);
 	r = sdchdir(buf);
 	if ( r & FAILED )
 	{
@@ -218,10 +222,37 @@ int doChdir()
 		clr_eos();
 		printf("sdchdir(%s) FAILED\n", buf);
 		printf("Result:0x%02x - Press Key...", r);
-		c = waitkey(1);
+		c = getchar();
 	}
 	return r;
 }
+
+int doMount()
+{
+	char c, buf[256];
+	int r;
+
+	csr_pos(PROMPTLN, 0);
+	clr_eos();
+	puts("Mount - Enter File/Path\n");
+	puts("? ");
+	gets(buf);
+	csr_pos(PROMPTLN, 0);
+	clr_eos();
+	printf("File: %s \n", buf);
+	puts("Enter drive (0,1) Any-aborts ?");
+	c = getchar();
+	switch (c)
+	{
+		case KEY_ZERO:
+		case KEY_ONE:
+			r = _mount(c-KEY_ZERO, buf);
+			break;
+
+	}
+	return r;
+}
+
 
 int banner()
 {
@@ -232,7 +263,7 @@ int banner()
 
 int main()
 {
-	int start, count, crsr, maxpg;
+	int r, start, count, crsr, maxpg;
 	int newdir, newpag, newmount;
 	char c;
 	scr_init();
@@ -242,23 +273,22 @@ int main()
 	newdir=1; newpag=0; newmount=1;
 	count=0;
 
-	while (c != 0x03 )
+	while (c != KEY_BRK )
 	{
 		if (newdir)
 		{
-			prntdir();
-			count = getdir(0, dbuf, DBUFLEN);
-			start = 0;
-			crsr = 0;
-			maxpg = (count / PGLEN) * PGLEN;
-			newdir = 0;
-			newpag = 1;
+			r = prntdir();
+			if (! (r & FAILED))
+			{
+				count = getdir(0, dbuf, DBUFLEN);
+				start = 0;
+				crsr = 0;
+				maxpg = (count / PGLEN) * PGLEN;
+				newdir = 0;
+				newpag = 1;
+			}
 		}
 		if (count)
-		// for (start=0; start<count; start+=PGLEN)	
-		// start = 0;
-		// crsr = 0;
-		// while (c != 0x03 )
 		{
 			if (newpag)
 			{
@@ -281,9 +311,13 @@ int main()
 			csr_pos(DIRSTLN+crsr, 0);
 			printf(">");
 			csr_pos(PROMPTLN, 0);
-			printf("(Mnt)1,2 (Umnt)Sh-1/Sh-2 (Sel)Enter\n");
-			printf("(Move)U/D (Pag)Sh-U/Sh-D (Chd)C (Quit)Brk");
-			c = waitkey(0);
+			printf("(Mnt)1,2,M (Umnt)Sh-1/Sh-2 (Sel)Enter\n");
+			printf("(Move)U/D  (Pag)Sh-U/Sh-D  (Chd)C (Quit)Brk");
+			c = getchar();
+			/*
+			csr_pos(BANNERLN ,51-4);
+			printf("0x%02x", c);
+			*/
 			csr_pos(DIRSTLN+crsr, 0);
 			printf(" ");
 			switch (c)
@@ -342,7 +376,21 @@ int main()
 					doChdir();
 					newdir=1;
 					break;
+
+				case KEY_M:
+					doMount();
+					newmount=1;
+					break;
 			}
+		}
+		else
+		{
+			csr_pos(PROMPTLN, 0);
+			clr_eos();
+			puts("SD Card or Directory Empty\n");
+			puts("Press Key to Exit...");
+			getchar();
+			break;
 		}
 	}
 	return 0;

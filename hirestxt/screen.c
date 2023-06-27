@@ -116,3 +116,37 @@ int scr_cls()
 	clr_eos();
 	return 0;
 }
+
+
+char *gets(buf)
+char *buf;
+{
+	char c, *p;
+
+	p = buf;
+	*p = 0;
+	while ((c=getchar()) != KEY_ENTER)
+	{
+		if (c == KEY_BRK)
+			break;
+		if (c == KEY_BS)
+		{
+			if (strlen(buf) > 0)
+			{
+				p--;
+				*p=0;
+				csr_lt();
+				putchar(' ');
+				csr_lt();
+			}
+		}
+		else
+		{
+			*p++ = c;
+			*p = 0;
+			putchar(c);
+		}
+	}
+	return buf;
+}
+
