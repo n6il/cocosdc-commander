@@ -50,7 +50,6 @@ char FindSDC()
         mpiSav = *(unsigned char *)MPIREG;
         /* Start with slot 4 */
         curMpi = mpiSav & 0x33 | 0x03;
-        curMpi |=  0x03;
         while (! (curMpi & 0x08) )
         {
                 /* Activate slot being scanned */
