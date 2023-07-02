@@ -1,0 +1,15 @@
+CC = dcc
+CFLAGS =-dOS9=1
+OBJS = sdccmdr.r string.r libsdc.r commsdc.r os9/screen.r
+
+all: sdccmdr
+
+sdccmdr: $(OBJS)
+	$(CC) $(CFLAGS) -f=/x0/$@ $(OBJS)
+
+%.r: %.c
+	$(CC) $(CFLAGS) -r $<
+
+clean:
+	rm -f *.o *.dsk
+

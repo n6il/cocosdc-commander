@@ -1,6 +1,8 @@
+#ifdef DECB
 #include <cmoc.h>
-#include "commsdc.h"
 #include "string.h"
+#endif
+#include "commsdc.h"
 #include "libsdc.h"
 
 char _buf[256];
@@ -9,15 +11,15 @@ char _buf[256];
 int sdumnt(drive)
 int drive;
 {
-	unsigned char cmd;
+        unsigned char cmd;
 
-	if (drive < 0 || drive > 1)
-		return FAILED;
+        if (drive < 0 || drive > 1)
+                return FAILED;
 
-	cmd = 0xe0 + drive;
+        cmd = 0xe0 + drive;
 
-	strcpy(_buf, "M:");
-	return CommSDC(cmd, 0, 0, 0, _buf);
+        strcpy(_buf, "M:");
+        return CommSDC(cmd, 0, 0, 0, _buf);
 }
 
 /* sdmnt */
@@ -25,16 +27,16 @@ int sdmnt(drive, path)
 int drive;
 char *path;
 {
-	unsigned char cmd;
+        unsigned char cmd;
 
-	if (drive < 0 || drive > 1)
-		return FAILED;
+        if (drive < 0 || drive > 1)
+                return FAILED;
 
-	cmd = 0xe0 + drive;
+        cmd = 0xe0 + drive;
 
-	strcpy(_buf, "M:");
-	strcat(_buf, path);
-	return CommSDC(cmd, 0, 0, 0, _buf);
+        strcpy(_buf, "M:");
+        strcat(_buf, path);
+        return CommSDC(cmd, 0, 0, 0, _buf);
 }
 
 /* sdimginf */
@@ -42,29 +44,29 @@ int sdimginf(buf, drive)
 char *buf;
 unsigned char drive;
 {
-	int r;
-	unsigned char cmd;
+        int r;
+        unsigned char cmd;
 
-	cmd = 0xc0 + drive;
+        cmd = 0xc0 + drive;
 
-	if (buf==0)
-		return FAILED;
+        if (buf==0)
+                return FAILED;
 
-	r = CommSDC(cmd, 0x49, 0, 0, buf);
-	return r;
+        r = CommSDC(cmd, 0x49, 0, 0, buf);
+        return r;
 }
 
 /* sdgtdpag */
 int sdgtdpag(buf)
 char *buf;
 {
-	int r;
+        int r;
 
-	if (buf==0)
-		return FAILED;
+        if (buf==0)
+                return FAILED;
 
-	r = CommSDC(0xc0, 0x3e, 0, 0, buf);
-	return r;
+        r = CommSDC(0xc0, 0x3e, 0, 0, buf);
+        return r;
 }
 
 
@@ -72,40 +74,34 @@ char *buf;
 int sdlstdir(path, filter)
 char *path, *filter;
 {
-	int r;
+        int r;
 
-	strcpy(_buf, "L:");
-	if (path != 0)
-	{
-		strcat(_buf, path);
-		strcat(_buf, "/");
-	}
-	if (filter==0)
-		strcat(_buf, "*.*");
-	else
-		strcat(_buf, filter);
-	
-	// printf("LD:%s\n", _buf);
-	r = CommSDC(0xe0, 0, 0, 0, _buf);
-	return r;
+        strcpy(_buf, "L:");
+        if (path != 0)
+        {
+                strcat(_buf, path);
+                strcat(_buf, "/");
+        }
+        if (filter==0)
+                strcat(_buf, "*.*");
+        else
+                strcat(_buf, filter);
+        
+        r = CommSDC(0xe0, 0, 0, 0, _buf);
+        return r;
 }
 
 /* Change SDC Directory */
 int sdchdir(dir)
 char *dir;
 {
-	int r;
-	char *p;
+        int r;
+        char *p;
 
-	strcpy(_buf, "D:");
-	strcat(_buf, dir);
-	// for (p=dir; *p != 0; p++)
-	// 	printf("%02x", *p);
-	// printf("\n");
-	// printf("CHDIR:%s\n", _buf);
-  	r = CommSDC(0xe0, 0,0,0, _buf);
-	// printf("CHDIR:STATUS:%02x\n", r);
-	return r;
+        strcpy(_buf, "D:");
+        strcat(_buf, dir);
+        r = CommSDC(0xe0, 0,0,0, _buf);
+        return r;
 }
 
 
@@ -120,12 +116,12 @@ of the current directory, not the full path.
 int sdgetcwd(buf)
 char *buf;
 {
-	int r;
-	char * p;
+        int r;
+        char * p;
 
-	*buf = 0;
-	r = CommSDC(0xc0, 0x43,0,0, _buf);
-	return r;
+        *buf = 0;
+        r = CommSDC(0xc0, 0x43,0,0, _buf);
+        return r;
 }
 
 /* sdgetpth recursive worker */
@@ -133,31 +129,27 @@ int _sdgetpth(buf, n)
 char *buf;
 int n;
 {
-	int r;
-	char dir[33];
-	char *p;
+        int r;
+        char dir[33];
+        char *p;
 
-	r = sdgetcwd(_buf);
-	if ( r == 0x90 )
-		strcpy(buf, "/");
-	else if ( ! (r & FAILED ))
-	{
-		// termstr(_buf);
-		strncpyz(dir, _buf, 8);
-		// printf("%d: %s\n", n, dir);
-		sdchdir("..");
-		r = _sdgetpth(buf, n+1);
-		strncatz(buf, dir, 8);
-		if (n>0)
-			strcat(buf, "/");
-	}
-	if (n==0)
-	{
-		// printf("%d: %s\n", n, buf);
-		r = sdchdir(buf);
-		// printf("STATUS: %02x\n", r);
-	}
-	return r;
+        r = sdgetcwd(_buf);
+        if ( r == 0x90 )
+                strcpy(buf, "/");
+        else if ( ! (r & FAILED ))
+        {
+                strncpyz(dir, _buf, 8);
+                sdchdir("..");
+                r = _sdgetpth(buf, n+1);
+                strncatz(buf, dir, 8);
+                if (n>0)
+                        strcat(buf, "/");
+        }
+        if (n==0)
+        {
+                r = sdchdir(buf);
+        }
+        return r;
 }
 
 /* 
@@ -171,8 +163,8 @@ int n;
 int sdgetpth(buf)
 char *buf;
 {
-	*buf = 0;
-	return _sdgetpth(buf, 0);
+        *buf = 0;
+        return _sdgetpth(buf, 0);
 }
 
 
@@ -189,36 +181,49 @@ char *path;
 struct dirent* dir;
 int n;
 {
-	int i,r, end, m;
-	struct dirent *p;
-	char buf[256];
-	char name[9];
-	char ext[4];
+        int i,r, end, m;
+        struct dirent *p;
+        char buf[256];
+        char name[9];
+        char ext[4];
 
-	r = sdlstdir(path, 0);
-	if (r & FAILED)
-		return 0;
-	end = 0;
-	m = 0;
-	while(n && (! end))
-	{
-		r = sdgtdpag(buf);
-		if (r & FAILED)
-			break;
-		for (i=0, p = (struct dirent *)buf ; n && i<16; i++, p++, n--, dir++)
-		{
-			*dir = *p;
-			if (p->name[0] == 0)
-			{
-				end = 1;
-				break;
-			}
-		       	else
-			{
-				m++;
-			}
-		}
-	}
-	return m;
+        r = sdlstdir(path, 0);
+        if (r & FAILED)
+                return 0;
+        end = 0;
+        m = 0;
+        while(n && (! end))
+        {
+                r = sdgtdpag(buf);
+                if (r & FAILED)
+                        break;
+                for (i=0, p = (struct dirent *)buf ; n && i<16; i++, p++, n--, dir++)
+                {
+#ifdef _MEMCPY
+                        memcpy(dir, p, sizeof(struct dirent));
+#else
+                        *dir = *p;
+#endif
+                        if (p->name[0] == 0)
+                        {
+                                end = 1;
+                                break;
+                        }
+                        else
+                        {
+                                m++;
+                        }
+                }
+        }
+        return m;
 }
 
+
+char findsdc()
+{
+        return FindSDC();
+}
+
+/*
+# vim: ts=8 sw=8 sts=8 et
+*/

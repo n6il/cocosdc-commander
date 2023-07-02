@@ -1,3 +1,5 @@
+#include "proto.h"
+
 #ifndef SCREEN_H
 #define SCREEN_H
 
@@ -6,7 +8,7 @@
 #define DIRSTLN 4
 #define PROMPTLN 21
 
-#define KEY_BRK         0x03
+#define KEY_BRK         0x1B
 #define KEY_BS          0x08
 #define KEY_ENTER       0x0D
 #define KEY_DOWN        0x0A
@@ -24,12 +26,12 @@
 #define KEY_m           0x6D
 #define KEY_Q           0x51
 #define KEY_q           0x71
-#define KEY_PGDN        0x5B
-#define KEY_UP          0x5E
-#define KEY_PGUP        0x5F
+#define KEY_PGDN        0x1A
+#define KEY_UP          0x0B
+#define KEY_PGUP        0x1C
 
-#define WRITE(fd, str, n) putstr(str, n)
-#define NL "\n"
+#define WRITE(pn, buffer, count) write(pn, buffer, count)
+#define NL "\n\l"
 
 int scr_init();
 int scr_exit();
@@ -41,13 +43,13 @@ int csr_lt();
 int csr_home();
 int clr_eos();
 int clr_eol();
-int csr_pos(unsigned char, unsigned char);
+int csr_pos _OP((unsigned char, unsigned char));
 int scr_cls();
 
-#define scr_getc() waitkey(1)
-#define scr_putc(c) putchar(c)
-#define scr_puts(s) putstr(s, strlen(s))
-char *scr_gets(char *);
+int scr_getc();
+int scr_putc _OP((char));
+int scr_puts _OP((char *));
+char *scr_gets _OP((char *));
 
 #endif
 

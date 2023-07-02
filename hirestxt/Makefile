@@ -4,5 +4,5 @@ all: screen.o
 	cmoc -c $<
 
 clean:
-	rm -f *.o *.dsk
+	rm -f *.o
 

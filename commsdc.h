@@ -1,8 +1,12 @@
+#include "proto.h"
+
 #ifndef COMMSDC_H
 #define COMMSDC_H
 
 /* Hardware Addressing - CoCo Scheme */
 #define CTRLATCH 0xff40
+#define FLSHDATA 0xff42
+#define FLSHCTRL 0xff43
 #define CMDREG   0xff48
 #define STATREG  0xff48
 #define PREG1    0xff49
@@ -10,6 +14,7 @@
 #define PREG3    0xff4b
 #define DATREGA  PREG2
 #define DATREGB  PREG3
+#define MPIREG   0xff7f
 
 /* Status Register Masks */
 #define OK       0x00
@@ -25,6 +30,11 @@
 #define CMDEXD   0xd0
 
 /* int CommSDC(cmd, prm1, prm2, prm3, buf) */
-int CommSDC(unsigned char, unsigned char, unsigned char, unsigned char, char *);
+int CommSDC _OP((unsigned char, unsigned char, unsigned char, unsigned char, char *));
+char FindSDC();
 
 #endif
+
+/*
+# vim: ts=8 sw=8 sts=8 et
+*/

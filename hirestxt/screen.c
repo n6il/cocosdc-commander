@@ -56,97 +56,103 @@ int scr_init()
     return 0;
 }
 
-#define write(fd, str, n) putstr(str, n)
-
 int csr_up()
 {
-	write(1, csr_up_s, 2);
-	return 0;
+        WRITE(1, csr_up_s, 2);
+        return 0;
 }
 
 int csr_dn()
 {
-	write(1, csr_dn_s, 2);
-	return 0;
+        WRITE(1, csr_dn_s, 2);
+        return 0;
 }
 
 int csr_rt()
 {
-	write(1, csr_rt_s, 2);
-	return 0;
+        WRITE(1, csr_rt_s, 2);
+        return 0;
 }
 
 int csr_lt()
 {
-	write(1, csr_lt_s, 2);
-	return 0;
+        WRITE(1, csr_lt_s, 2);
+        return 0;
 }
 
 
 int csr_home()
 {
-	write(1, csr_home_s, 2);
-	return 0;
+        WRITE(1, csr_home_s, 2);
+        return 0;
 }
 
 int clr_eos()
 {
-	write(1, clr_eos_s, 2);
-	return 0;
+        WRITE(1, clr_eos_s, 2);
+        return 0;
 }
 
 int clr_eol()
 {
-	write(1, clr_eol_s, 2);
-	return 0;
+        WRITE(1, clr_eol_s, 2);
+        return 0;
 }
 
 int csr_pos(y,x)
 unsigned char y,x;
 {
-	csr_pos_s[2] = ' '+y;
-	csr_pos_s[3] = ' '+x;
-	write(1, csr_pos_s, 4);
-	return 0;
+        csr_pos_s[2] = ' '+y;
+        csr_pos_s[3] = ' '+x;
+        WRITE(1, csr_pos_s, 4);
+        return 0;
 }
 
 int scr_cls()
 {
-	csr_home();
-	clr_eos();
-	return 0;
+        csr_home();
+        clr_eos();
+        return 0;
 }
 
 
-char *gets(buf)
+char *scr_gets(buf)
 char *buf;
 {
-	char c, *p;
+        char c, *p;
 
-	p = buf;
-	*p = 0;
-	while ((c=getchar()) != KEY_ENTER)
-	{
-		if (c == KEY_BRK)
-			break;
-		if (c == KEY_BS)
-		{
-			if (strlen(buf) > 0)
-			{
-				p--;
-				*p=0;
-				csr_lt();
-				putchar(' ');
-				csr_lt();
-			}
-		}
-		else
-		{
-			*p++ = c;
-			*p = 0;
-			putchar(c);
-		}
-	}
-	return buf;
+        p = buf;
+        *p = 0;
+        while ((c=scr_getc()) != KEY_ENTER)
+        {
+                if (c == KEY_BRK)
+                        break;
+                if (c == KEY_BS)
+                {
+                        if (strlen(buf) > 0)
+                        {
+                                p--;
+                                *p=0;
+                                csr_lt();
+                                scr_putc(' ');
+                                csr_lt();
+                        }
+                }
+                else
+                {
+                        *p++ = c;
+                        *p = 0;
+                        scr_putc(c);
+                }
+        }
+        return buf;
 }
 
+int scr_exit()
+{
+        return 0;
+}
+
+/*
+# vim: ts=8 sw=8 sts=8 et
+*/
