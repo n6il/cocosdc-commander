@@ -5,39 +5,66 @@
 
 char mpiSlot = -1;
 
-
+#ifdef DECB
 int maskIntr()
 {
-#ifdef DECB
         asm {
                 orcc #$50
         }
-#else
-
-#asm
- orcc #$50
-#endasm
-
-#endif
          return 0;
 }
 
 int rstrIntr()
 {
-#ifdef DECB
         asm {
                 andcc #$AF
         }
-#else
+         return 0;
+}
 
+#endif
+
+#ifdef OS9
+int maskIntr()
+{
+#asm
+ orcc #$50
+#endasm
+         return 0;
+}
+
+int rstrIntr()
+{
 #asm
  andcc #$AF
 #endasm
-
+         return 0;
+}
 #endif
-        return 0;
+
+
+#ifdef FLEX
+int maskIntr()
+{
+#asm
+ orcc #$50
+#endasm
+         return 0;
 }
 
+int rstrIntr()
+{
+#asm
+ andcc #$AF
+#endasm
+         return 0;
+}
+#endif
+
+#ifdef FUZIX
+void maskIntr();
+void rstrIntr();
+#endif
 
 /* Find which MPI Slot the SDC Is in */
 /* Returns -1 if not found */

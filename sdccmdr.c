@@ -23,6 +23,12 @@
 #include "screen.h"
 #endif
 
+#ifdef FUZIX
+#include <stdio.h>
+#include <string.h>
+#include "fuzix/screen.h"
+#endif
+
 struct dirent dbuf[DBUFLEN];
 
 char lbuf[81];

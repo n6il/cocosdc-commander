@@ -25,6 +25,12 @@
 #endif
 #endif
 
+#ifdef FUZIX
+#ifndef _OP
+#define _OP(x) x
+#endif
+#endif
+
 #endif
 
 /*
