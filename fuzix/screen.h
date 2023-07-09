@@ -1,4 +1,4 @@
-#include "../proto.h"
+#include "proto.h"
 
 #ifndef SCREEN_H
 #define SCREEN_H
@@ -10,8 +10,8 @@
 
 #define KEY_BRK         0x03
 #define KEY_BS          0x08
-#define KEY_ENTER       0x0D
-#define KEY_DOWN        0x0A
+#define KEY_ENTER       0x0A
+#define KEY_DOWN        0x7C
 #define KEY_SPC         0x20
 #define KEY_EXP         0x21
 #define KEY_AT          0x22
@@ -26,9 +26,9 @@
 #define KEY_m           0x6D
 #define KEY_Q           0x51
 #define KEY_q           0x71
-#define KEY_PGDN        0x1A
-#define KEY_UP          0x0C
-#define KEY_PGUP        0x1C
+#define KEY_PGDN        0x5D
+#define KEY_UP          0x5E
+#define KEY_PGUP        0x5B
 
 #define WRITE(pn, buffer, count) write(pn, buffer, count)
 #define NL "\r\n"

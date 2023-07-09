@@ -2,6 +2,9 @@
 #include <cmoc.h>
 #endif
 #include "string.h"
+#ifdef FUZIX
+#include <string.h>
+#endif
 
 /* strcpyz
  * Copy from src to dest

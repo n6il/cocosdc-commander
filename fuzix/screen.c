@@ -4,6 +4,8 @@
 #include <string.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <signal.h>
+
 
 struct termios prior, new;
 
@@ -20,25 +22,24 @@ char clr_eol_s[2];
 char csr_pos_s[4];
 char echo;
 
-/*
-int interrupt(sig)
+#define puterr scr_puts
+
+void interrupt(sig)
 int sig;
 {
+	signal(SIGINT, SIG_IGN);
         csr_pos(PROMPTLN, 0);
         clr_eos();
         scr_exit();
         exit(sig);
 }
-*/
 
 int scr_init()
 {
 
         int fd;
 
-        /*
-        intercept(interrupt);
-        */
+        signal(SIGINT, interrupt);
 
         csr_up_s[0] = 0x1b;
         csr_up_s[1] = 'A';

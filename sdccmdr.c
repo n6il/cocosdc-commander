@@ -26,7 +26,7 @@
 #ifdef FUZIX
 #include <stdio.h>
 #include <string.h>
-#include "fuzix/screen.h"
+#include "screen.h"
 #endif
 
 struct dirent dbuf[DBUFLEN];

@@ -75,3 +75,23 @@ follows:
     CC STRING.C +DFLEX=1 +R
     CC SCREEN.C +DFLEX=1 +R
     CC SDCCMDR.R LIBSDC.R COMMSDC.R STRING.R SCREEN.R +DFLEX=1 +F=<DRIVE>.SDCCMDR.CMD
+
+# Building for FUZIX
+
+## Download and Build preparation steps
+
+    cd ${FUZIX_ROOT}/Applications
+    git clone https://github.com/n6il/cocosdc-commander.git sdccmdr
+    cd sdccmdr/fuzix
+    ./install.sh
+
+## Rebuild `fuzixfs.dsk` to include `sdccmdr`
+
+    cd ${FUZIX_ROOT}/Kernel/platform-coco3
+    ./rebuild
+
+## Standalone build
+
+    cd ${FUZIX_ROOT}/Applications/sdccmdr
+    make FUZIX_ROOT=${FUZIX_ROOT} USERCPU=6809 -f Makefile.6809
+

@@ -68,27 +68,27 @@ void rstrIntr();
 
 /* Find which MPI Slot the SDC Is in */
 /* Returns -1 if not found */
-char FindSDC()
+int FindSDC()
 {
         unsigned char mpiSav, curMpi, t1;
 
         maskIntr();
         /* Save current MPI Slot */
-        mpiSav = *(unsigned char *)MPIREG;
+        mpiSav = *(VOLATILE unsigned char *)MPIREG;
         /* Start with slot 4 */
         curMpi = mpiSav & 0x33 | 0x03;
         while (! (curMpi & 0x08) )
         {
                 /* Activate slot being scanned */
-                *(unsigned char *)MPIREG = curMpi;
+                *(VOLATILE unsigned char *)MPIREG = curMpi;
                 /* Store test pattern to Flash Data Reg */
-                *(unsigned char *)FLSHDATA = 0x64;
+                *(VOLATILE unsigned char *)FLSHDATA = 0x64;
                 /* Get value from Flash Control Reg */
-                t1 = *(unsigned char *)FLSHCTRL;
+                t1 = *(VOLATILE unsigned char *)FLSHCTRL;
                 /* Clear Flash Data Reg */
-                *(unsigned char *)FLSHDATA = 0;
+                *(VOLATILE unsigned char *)FLSHDATA = 0;
                 /* Did expected bits change? */
-                t1 ^= *(unsigned char *)FLSHCTRL;
+                t1 ^= *(VOLATILE unsigned char *)FLSHCTRL;
                 t1 -= 0x60;
                 if (!t1)
                         break;
@@ -100,7 +100,7 @@ char FindSDC()
         else
                 /* Found */
                 mpiSlot = curMpi;
-        *(unsigned char *)MPIREG = mpiSav;
+        *(VOLATILE unsigned char *)MPIREG = mpiSav;
         rstrIntr();
         return mpiSlot;
 }
@@ -119,7 +119,7 @@ int waitForIt()
         counter = 0;
         while(--counter)
         {
-                status = *(unsigned char *)STATREG;
+                status = *(VOLATILE unsigned char *)STATREG;
                 if (status & FAILED)
                 {
                         break;
@@ -158,26 +158,26 @@ char *buf;
         /* Switch MPI Slot */
         if (mpiSlot >= 0)
         {
-                mpi = *(unsigned char *)MPIREG;
-                *(unsigned char *)MPIREG = mpiSlot;
+                mpi = *(VOLATILE unsigned char *)MPIREG;
+                *(VOLATILE unsigned char *)MPIREG = mpiSlot;
         }
 
         /* Put controller in Command mode */
-        *(unsigned char *)CTRLATCH = CMDMODE;
+        *(VOLATILE unsigned char *)CTRLATCH = CMDMODE;
 
         /* Put input parameters into the hardware registers.
          * It does no harm to put random data in the
          * registers for commands which do not uset them */
-        *(unsigned char *)PREG1  = prm1;
-        *(unsigned char *)PREG2  = prm2;
-        *(unsigned char *)PREG3  = prm3;
+        *(VOLATILE unsigned char *)PREG1  = prm1;
+        *(VOLATILE unsigned char *)PREG2  = prm2;
+        *(VOLATILE unsigned char *)PREG3  = prm3;
 
         /* Wait for not busy */
         r = waitForIt();
         if (! (r & FAILED))
         {
                 /* Send command to controller */
-                *(unsigned char *)CMDREG = cmd;
+                *(VOLATILE unsigned char *)CMDREG = cmd;
 
                 /* Determine if any data block needs to be sent.
                  * Any command which requires a data block will
@@ -191,8 +191,8 @@ char *buf;
                                 /* Send 256 bytes of data */
                                 for(i=0, p=buf; i<128;i++)
                                 {
-                                        *(unsigned char *)DATREGA = *p++;
-                                        *(unsigned char *)DATREGB = *p++;
+                                        *(VOLATILE unsigned char *)DATREGA = *p++;
+                                        *(VOLATILE unsigned char *)DATREGB = *p++;
                                 }
 
                                 /* Wait for command completion */
@@ -216,15 +216,15 @@ char *buf;
                 {
                         for(i=0, p=buf; i<128;i++)
                         {
-                                *p++ = *(unsigned char *)DATREGA;
-                                *p++ = *(unsigned char *)DATREGB;
+                                *p++ = *(VOLATILE unsigned char *)DATREGA;
+                                *p++ = *(VOLATILE unsigned char *)DATREGB;
                         }
                 }
         }
 
-        *(unsigned char *)CTRLATCH = 0;
+        *(VOLATILE unsigned char *)CTRLATCH = 0;
         if (mpiSlot >= 0)
-                *(unsigned char *)MPIREG = mpi;
+                *(VOLATILE unsigned char *)MPIREG = mpi;
 
         rstrIntr();
         return r;

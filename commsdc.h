@@ -31,7 +31,7 @@
 
 /* int CommSDC(cmd, prm1, prm2, prm3, buf) */
 int CommSDC _OP((unsigned char, unsigned char, unsigned char, unsigned char, char *));
-char FindSDC();
+int FindSDC();
 
 #endif
 

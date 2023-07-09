@@ -26,7 +26,7 @@ int sdchdir _OP((char *));
 int sdgetcwd _OP((char *));
 int sdgetpth _OP((char *));
 int getdir _OP((char *, struct dirent *, int));
-char findsdc();
+int findsdc();
 
 #endif
 

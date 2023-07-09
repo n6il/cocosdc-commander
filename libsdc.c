@@ -4,6 +4,9 @@
 #endif
 #include "commsdc.h"
 #include "libsdc.h"
+#ifdef FUZIX
+#include <string.h>
+#endif
 
 char _buf[256];
 
@@ -219,7 +222,7 @@ int n;
 }
 
 
-char findsdc()
+int findsdc()
 {
         return FindSDC();
 }

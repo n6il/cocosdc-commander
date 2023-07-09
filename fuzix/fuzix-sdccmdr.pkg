@@ -1,0 +1,5 @@
+package  sdccmdr
+if-file  ../sdccmdr
+
+f 0755 /usr/bin/sdccmdr        ../sdccmdr
+f 0755 /usr/bin/scrtest        ../scrtest
