@@ -20,7 +20,12 @@
 #define OK       0x00
 #define BUSY     0x01
 #define READY    0x02
+#define EINVLD  .0x04
+#define EHWERR  .0x08
+#define EFNF .   0x10
+#define EINUSE . 0x20
 #define FAILED   0x80
+#define ENOMNT   0x80
 
 /* Mode and Command Values */
 #define CMDMODE  0x43

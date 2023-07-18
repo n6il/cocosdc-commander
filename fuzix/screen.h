@@ -24,11 +24,14 @@
 #define KEY_c           0x63
 #define KEY_M           0x4D
 #define KEY_m           0x6D
+#define KEY_N           0x4E
+#define KEY_n           0x6E
 #define KEY_Q           0x51
 #define KEY_q           0x71
 #define KEY_PGDN        0x5D
 #define KEY_UP          0x5E
 #define KEY_PGUP        0x5B
+#define KEY_PLUS        0x2B
 
 #define WRITE(pn, buffer, count) write(pn, buffer, count)
 #define NL "\r\n"

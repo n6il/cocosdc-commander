@@ -300,6 +300,101 @@ int doMount()
 }
 
 
+int doNew()
+{
+        char c, buf[80], buf2[80], *p;
+        int r, drive, cyl, sides, sdf;
+
+        /* Get filename */
+        csr_pos(PROMPTLN, 0);
+        clr_eos();
+        scr_puts("New Disk - Enter File/Path");
+        scr_puts(NL);
+        scr_puts("? ");
+        scr_gets(buf);
+
+        /* Get Drive */
+        drive = -1;
+        while (drive == -1)
+        {
+                csr_pos(PROMPTLN, 0);
+                clr_eos();
+                sprintf(lbuf, "File: %s%s", buf, NL);
+                scr_puts(lbuf);
+                scr_puts("Enter drive (0,1) Any-aborts ?");
+                c = scr_getc();
+                switch (c)
+                {
+                        case KEY_ZERO:
+                        case KEY_ONE:
+                                drive = c-KEY_ZERO;
+                                break;
+
+                        default:
+                                drive = -1;
+                }
+        }
+
+        /* Check if its SDF */
+        sdf = -1;
+        p = strchr(buf, '.');
+        if (p)
+                sdf = strcmp(p+1, "sdf");
+        if (p && sdf != 0) 
+                sdf = strcmp(p+1, "SDF");
+
+        /* Not sdf - ask if customization needed */
+        if (sdf!=0)
+        {
+                csr_pos(PROMPTLN, 0);
+                clr_eos();
+                scr_puts("Customize Tracks/Sides 1=Yes Enter=No ?");
+                c = scr_getc();
+                if (c==KEY_ONE)
+                        sdf=0;
+                else
+                        sdf=-1;
+        }
+
+        if ( sdf==0 )
+        {
+                /* SDF or customization requested */
+                cyl = 0;
+                while (cyl<1 || cyl>80)
+                {
+                        csr_pos(PROMPTLN, 0);
+                        clr_eos();
+                        scr_puts("Tracks (1-80) ?");
+                        scr_gets(buf2);
+                        cyl = atoi(buf2);
+                }
+                sides = 0;
+                while (sides<1 || sides>2)
+                {
+                        csr_pos(PROMPTLN, 0);
+                        clr_eos();
+                        scr_puts("Sides (1 or 2) ?");
+                        scr_gets(buf2);
+                        sides = atoi(buf2);
+                }
+        }
+
+        /* create the new disk */
+        r = sdnewimg(c-KEY_ZERO, cyl, sides, buf);
+        if ( r & FAILED )
+        {
+                csr_pos(PROMPTLN, 0);
+                clr_eos();
+                sprintf(lbuf, "sdnewimg(%s) FAILED%s", buf, NL);
+                scr_puts(lbuf);
+                sprintf(lbuf, "Result:0x%02x - Press Key...", r);
+                scr_puts(lbuf);
+                c = scr_getc();
+        }
+        return r;
+}
+
+
 int banner()
 {
         csr_pos(BANNERLN, 9);
@@ -368,7 +463,7 @@ int main()
                                 newmount = 0;
                                 newprompt = 1;
                         }
-                        csr_pos(DIRSTLN+crsr, 0);
+                        csr_pos(DIRSTLN+(unsigned char)crsr, 0);
                         scr_putc('>');
                         csr_pos(PROMPTLN-1, 0);
                         if (newprompt)
@@ -388,7 +483,7 @@ int main()
                         csr_pos(BANNERLN ,51-4);
                         printf("0x%02x", c);
                         */
-                        csr_pos(DIRSTLN+crsr, 0);
+                        csr_pos(DIRSTLN+(unsigned char)crsr, 0);
                         scr_putc(' ');
                         switch (c)
                         {
@@ -403,6 +498,7 @@ int main()
                                         {
                                                 crsr = (start>=PGLEN) ? PGLEN-1 : 0;
                                         }
+
                                 case KEY_PGUP:
                                 case KEY_B:
                                 case KEY_b:
@@ -412,6 +508,7 @@ int main()
                                         newpag=1;
                                         newprompt=1;
                                         break;
+
                                 case KEY_DOWN:
                                         if (crsr < (PGLEN-1))
                                         {
@@ -424,6 +521,7 @@ int main()
                                         {
                                                 crsr = 0;
                                         }
+
                                 case KEY_PGDN:
                                 case KEY_SPC:
                                         start = start<maxpg ? start + PGLEN : maxpg;
@@ -463,6 +561,17 @@ int main()
                                         newmount=1;
                                         newprompt=1;
                                         break;
+
+                                case KEY_N:
+                                case KEY_n:
+                                        doNew();
+                                        newmount=1;
+                                        newprompt=1;
+                                        break;
+
+                                case KEY_PLUS:
+                                        sdnxtdsk();
+                                        newmount=1;
                         }
                 }
                 else

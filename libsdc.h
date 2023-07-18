@@ -19,6 +19,7 @@ struct dirent {
 
 int sdumnt _OP((int));
 int sdmnt _OP((int, char *));
+int sdnewimg _OP((int, int, int, char *));
 int sdimginf _OP((char *, unsigned char));
 int sdgtdpag _OP((char *));
 int sdlstdir _OP((char *, char *));
@@ -27,6 +28,7 @@ int sdgetcwd _OP((char *));
 int sdgetpth _OP((char *));
 int getdir _OP((char *, struct dirent *, int));
 int findsdc();
+int sdnxtdsk();
 
 #endif
 

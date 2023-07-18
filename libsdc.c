@@ -42,6 +42,23 @@ char *path;
         return CommSDC(cmd, 0, 0, 0, _buf);
 }
 
+/* sdnewimg */
+int sdnewimg(drive, cyl, sides, path)
+int drive, cyl, sides;
+char *path;
+{
+        unsigned char cmd;
+
+        if (drive < 0 || drive > 1)
+                return FAILED;
+
+        cmd = 0xe0 + drive;
+
+        strcpy(_buf, "N:");
+        strcat(_buf, path);
+        return CommSDC(cmd, cyl, sides, 0, _buf);
+}
+
 /* sdimginf */
 int sdimginf(buf, drive)
 char *buf;
@@ -226,6 +243,13 @@ int findsdc()
 {
         return FindSDC();
 }
+
+/* sdnxtdsk */
+int sdnxtdsk()
+{
+        return CommSDC(0xc0, 0x2b, 0, 0, (char *)0xffff);
+}
+
 
 /*
 # vim: ts=8 sw=8 sts=8 et
